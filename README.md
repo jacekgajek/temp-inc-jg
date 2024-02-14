@@ -53,3 +53,7 @@ Modules and their description:
 Goal is to implement solution flow end to end, from data generator, to anomaly detection, storing detected anomalies in database and have a REST API to query for anomaly analytics.
   
 Repository is configured as template, please do not fork it, you can create a copy of this repo, [docs here](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template#creating-a-repository-from-a-template).
+
+## Sample requests
+
+See temperature-analytics-api/src/test/resources

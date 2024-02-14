@@ -1,12 +1,16 @@
-package io.kontak.apps.anomaly.detector;
+package io.kontak.apps.anomaly.detector
 
-import io.kontak.apps.event.Anomaly;
-import io.kontak.apps.event.TemperatureReading;
+import io.kontak.apps.event.Anomaly
+import io.kontak.apps.event.TemperatureReading
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
+interface AnomalyDetector : (TemperatureReading) -> List<Anomaly>
 
-public interface AnomalyDetector extends Function<List<TemperatureReading>, Optional<Anomaly>> {
-
-}
+context(T)
+inline fun <reified T : AnomalyDetector> TemperatureReading.toAnomaly(): Anomaly = Anomaly(
+    readingID = id,
+    roomId = roomId,
+    thermometerId = thermometerId,
+    timestamp = timestamp,
+    temperature = temperature,
+    anomalyDetector = T::class.simpleName!!
+)

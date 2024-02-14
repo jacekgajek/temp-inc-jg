@@ -1,27 +1,44 @@
-package io.kontak.apps.anomaly.detector;
+package io.kontak.apps.anomaly.detector
 
-import io.kontak.apps.event.Anomaly;
-import io.kontak.apps.event.TemperatureReading;
-import org.apache.kafka.streams.kstream.KStream;
+import io.kontak.apps.event.Anomaly
+import io.kontak.apps.event.TemperatureReading
+import org.apache.kafka.streams.kstream.KStream
+import java.util.function.Function
 
-import java.util.List;
-import java.util.function.Function;
-
-public class TemperatureMeasurementsListener implements Function<KStream<String, TemperatureReading>, KStream<String, Anomaly>> {
-
-    private final AnomalyDetector anomalyDetector;
-
-    public TemperatureMeasurementsListener(AnomalyDetector anomalyDetector) {
-        this.anomalyDetector = anomalyDetector;
-    }
-
-    @Override
-    public KStream<String, Anomaly> apply(KStream<String, TemperatureReading> events) {
-        //TODO adapt to Recruitment Task requirements
+open class TemperatureMeasurementsListener(private val anomalyDetectors: List<AnomalyDetector>) : Function<KStream<String, TemperatureReading>, KStream<String, Anomaly>> {
+    override fun apply(events: KStream<String, TemperatureReading>): KStream<String, Anomaly> {
         return events
-                .mapValues((temperatureReading) -> anomalyDetector.apply(List.of(temperatureReading)))
-                .filter((s, anomaly) -> anomaly.isPresent())
-                .mapValues((s, anomaly) -> anomaly.get())
-                .selectKey((s, anomaly) -> anomaly.thermometerId());
+            .flatMapValues { temperatureReading: TemperatureReading -> detectAnomalies(temperatureReading) }
+            .selectKey { _, anomaly: Anomaly -> anomaly.thermometerId }
     }
+
+    private fun detectAnomalies(temperatureReading: TemperatureReading): Iterable<Anomaly> =
+        anomalyDetectors.asSequence()
+            .map { detector -> detector(temperatureReading) }
+            .flatten()
+            .asIterable()
+            .toList()
+
+
+    /*
+    POSSIBLE ALTERNATIVE SOLUTION:
+
+    Use Kafka time-window capabilities, something like this:
+
+        override fun apply(events: KStream<String, TemperatureReading>): KStream<String, Anomaly> {
+        return events
+            .selectKey { s, value -> value.id.toByteArray() }
+            .groupByKey()
+            .windowedBy(TimeWindows.ofSizeAndGrace(ofSeconds(10), ofSeconds(1)).advanceBy(ofSeconds(1)))
+            .aggregate(
+                { ReadingList() },
+                { key, reading, list -> ReadingList(list.readings + reading) },
+                Materialized.with(Serdes.ByteArray(), JsonSerde(ReadingList::class.java))
+            )
+            .mapValues { readings -> detectAnomalies(readings.readings) }
+            .toStream()
+            .flatMapValues { _, v -> v }
+            .selectKey { _, value -> value.readingID }
+    }
+     */
 }

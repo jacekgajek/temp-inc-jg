@@ -1,6 +1,7 @@
-package io.kontak.apps.event;
+package io.kontak.apps.event
 
-import java.time.Instant;
+import java.time.Instant
 
-public record Anomaly(double temperature, String roomId, String thermometerId, Instant timestamp) {
-}
+@JvmRecord
+data class Anomaly(val readingID: String, val temperature: Double, val roomId: String, @JvmField val thermometerId: String, val timestamp: Instant, val anomalyDetector: String)
+

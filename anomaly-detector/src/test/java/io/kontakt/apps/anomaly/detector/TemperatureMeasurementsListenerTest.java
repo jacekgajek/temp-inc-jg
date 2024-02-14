@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 public class TemperatureMeasurementsListenerTest extends AbstractIntegrationTest {
 
@@ -27,10 +28,10 @@ public class TemperatureMeasurementsListenerTest extends AbstractIntegrationTest
                      kafkaContainer.getBootstrapServers(),
                      inputTopic
              )) {
-            TemperatureReading temperatureReading = new TemperatureReading(20d, "room", "thermometer", Instant.parse("2023-01-01T00:00:00.000Z"));
-            producer.produce(temperatureReading.thermometerId(), temperatureReading);
+            TemperatureReading temperatureReading = new TemperatureReading(UUID.randomUUID().toString(), 20d, "room", "thermometer", Instant.parse("2023-01-01T00:00:00.000Z"));
+            producer.produce(temperatureReading.thermometerId, temperatureReading);
             consumer.drain(
-                    consumerRecords -> consumerRecords.stream().anyMatch(r -> r.value().thermometerId().equals(temperatureReading.thermometerId())),
+                    consumerRecords -> consumerRecords.stream().anyMatch(r -> r.value().thermometerId.equals(temperatureReading.thermometerId)),
                     Duration.ofSeconds(5)
             );
         }

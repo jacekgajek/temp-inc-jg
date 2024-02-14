@@ -8,7 +8,7 @@ import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-@SpringBootTest(classes = AnomalyDetectorApplication.class)
+@SpringBootTest(classes = {  AnomalyDetectorApplication.class, AlwaysAnomalyDetector.class  })
 @Testcontainers
 public class AbstractIntegrationTest {
 

@@ -1,0 +1,56 @@
+DELETE http://localhost:9200/anomaly
+Accept: application/json
+
+###
+GET http://localhost:9200/_cat/indices
+Accept: application/json
+
+###
+
+GET http://localhost:9200/anomaly/_search
+###
+
+GET http://localhost:9200/anomaly/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "thermometer_id": {
+        "query": "82bb2a24-6911-4c0c-8aa5-ae129068c3c6"
+      }
+    }
+  }
+}
+
+###
+GET http://localhost:9200/anomaly/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "thermometer_id": {
+        "query": "82bb2a24-6911-4c0c-8aa5-ae129068c3c6"
+      }
+    }
+  }
+}
+
+###
+GET http://localhost:9200/anomaly/_search
+Content-Type: application/json
+
+{
+  "size": 0,
+  "aggs": {
+    "thermometer_ids": {
+      "terms": {
+        "field": "thermometer_id.keyword",
+        "min_doc_count": 5
+      }
+    }
+  }
+}
+
+###

@@ -1,0 +1,9 @@
+GET http://localhost:8081/api/v1/rooms/0bb4cc51-cd6d-45d4-84da-769a8eaba8f7/anomalies
+
+###
+GET http://localhost:8081/api/v1/thermometers/d0f34b1f-d5ac-4767-96dc-17e584c5fed4/anomalies
+
+###
+GET http://localhost:8081/api/v1/thermometers?threshold=2
+
+###

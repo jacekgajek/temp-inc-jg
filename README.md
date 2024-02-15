@@ -1,6 +1,14 @@
 # Temp-Inc
 'Always Right Temp Inc' temperature anomalies solution 
 
+
+## Solution Comment
+
+I've implemented the anomaly detection algorithms with custom aggregation code. Then they are sent by kafka to a storage service, which saves them to the Elastic Search database (I'd use Open Search if it was Spring Boot 3). And then the temperature-analytics-api exposes data using a reactive controller.
+
+
+Sample requests: See temperature-analytics-api/src/test/resources
+
 ## Recruitment Task Description
 
 Introducing 'Always Right Temp Inc' 🌡️🌞, the masters of temperature sensors! They've entrusted you to create an anomaly detector.

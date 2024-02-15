@@ -1,5 +1,6 @@
 package io.kontak.apps.anomaly.detector
 
+import io.kontak.apps.anomaly.detector.config.logger
 import io.kontak.apps.event.Anomaly
 import io.kontak.apps.event.TemperatureReading
 import org.springframework.stereotype.Component
@@ -12,12 +13,13 @@ import kotlin.math.abs
 class TimeWindowReadingsAnomalyDetector : AnomalyDetector {
 
     private val threshold = 5.0
+    private val log = logger()
     private val readingBuffer = HashMap<String, TimeBoundQueue>()
 
     override fun invoke(t: TemperatureReading): List<Anomaly> {
         val readings = readingBuffer.computeIfAbsent(t.thermometerId) { TimeBoundQueue() }
         readings.offer(t)
-        return readings.scanForAnomalies(threshold).map { it.toAnomaly() }.onEach { println("Anomaly detected: $it") }
+        return readings.scanForAnomalies(threshold).map { it.toAnomaly() }.onEach { log.trace("Anomaly detected: {}", it) }
     }
 
     private class TimeBoundQueue(

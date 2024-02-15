@@ -1,5 +1,7 @@
 package io.kontak.apps.temperature.generator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,7 @@ import reactor.core.publisher.Sinks;
 
 @Component
 public class TemperatureStreamPublisher {
+    private final Logger log = LoggerFactory.getLogger(TemperatureStreamPublisher.class);
 
     private final Sinks.Many<Message<TemperatureReading>> messageProducer = Sinks.many().multicast().onBackpressureBuffer();
 
@@ -18,7 +21,7 @@ public class TemperatureStreamPublisher {
     }
 
     public void publish(TemperatureReading temperatureReading) {
-        System.out.println("Emitting reading: " + temperatureReading);
+        log.trace("Emitting reading: {}", temperatureReading);
         messageProducer.tryEmitNext(
                 MessageBuilder.withPayload(temperatureReading)
                         .setHeader("identifier", temperatureReading.thermometerId)

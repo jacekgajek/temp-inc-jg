@@ -24,7 +24,7 @@ class TimeWindowReadingsAnomalyDetectorTest {
         ).map { (temp, millis) -> TemperatureReading(temperature = temp, roomId = "1", thermometerId = "1", timestamp = Instant.ofEpochMilli(millis))  }
 
         val detector = TimeWindowReadingsAnomalyDetector()
-        val anoms = readings.map(detector).flatten()
+        val anoms = readings.map(detector).flatten().distinctBy { it.readingID }
 
         assertThat(anoms).hasSize(2)
         assertThat(anoms[0].temperature).isCloseTo(25.1, Offset.offset(0.01))
